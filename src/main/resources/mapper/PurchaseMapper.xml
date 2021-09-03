@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.phj.mapper.PurchaseMapper">
+
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.phj.pojo.Purchase">
+        <id column="id" property="id"/>
+        <result column="total_money" property="totalMoney"/>
+        <result column="pay_status" property="payStatus"/>
+        <result column="type" property="type"/>
+        <result column="worker_id" property="workerId"/>
+        <result column="supplier_id" property="supplierId"/>
+        <result column="comment" property="comment"/>
+        <result column="purchase_date" property="purchaseDate"/>
+        <result column="distribution_start" property="distributionStart"/>
+        <result column="distribution_end" property="distributionEnd"/>
+        <result column="create_date" property="createDate"/>
+        <result column="update_date" property="updateDate"/>
+        <result column="is_delete" property="isDelete"/>
+        <association property="supplier">
+            <id column="supplierId" property="id"/>
+            <result column="supplierName" property="name"/>
+        </association>
+        <association property="sysUser" >
+            <result column="userName" property="name"/>
+            <result column="userId" property="id"/>
+        </association>
+
+    </resultMap>
+
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, total_money, pay_status, type, worker_id, supplier_id, comment, purchase_date, distribution_start, distribution_end, create_date, update_date, is_delete
+    </sql>
+
+    <select id="baseSelect" resultMap="BaseResultMap">
+        SELECT p.*,
+        s.id supplierId,s.`name` supplierName,
+        u.`name`  userName,u.id userId
+        FROM tb_purchase p,tb_supplier s,sys_user u
+        <trim prefix="where" prefixOverrides="and | or">
+            <if test="id !=null">
+                and p.id = #{id}
+            </if>
+            <if test="totalMoney !=null">
+                and total_money = #{totalMoney}
+            </if>
+            <if test="payStatus !=null">
+                and pay_status = #{payStatus}
+            </if>
+            <if test="type !=null">
+                and type = #{type}
+            </if>
+            <if test="workerId !=null">
+                and p.`worker_id` = #{workerId} and u.`id` = p.`worker_id`
+            </if>
+            <if test="workerId ==null">
+                 and u.`id` = p.`worker_id`
+            </if>
+            <if test="supplierId !=null">
+                and supplier_id = #{supplierId}  and p.`supplier_id`= s.`id`
+            </if>
+            <if test="supplierId ==null">
+               and p.`supplier_id`= s.`id`
+            </if>
+            <if test="comment !=null and comment  != ''">
+                and comment  = #{comment}
+            </if>
+            <if test="purchaseDate !=null">
+                and purchase_date = #{purchaseDate}
+            </if>
+            <if test="purchaseDateStart !=null">
+                and purchase_date  <![CDATA[ >= ]]> #{purchaseDateStart}
+            </if>
+            <if test="purchaseDateEnd !=null">
+                and purchase_date  <![CDATA[ <= ]]> #{purchaseDateEnd}
+            </if>
+            <if test="distributionStart !=null">
+                and distribution_start = #{distributionStart}
+            </if>
+            <if test="distributionEnd !=null">
+                and distribution_end = #{distributionEnd}
+            </if>
+            <if test="createDate !=null">
+                and create_date = #{createDate}
+            </if>
+            <if test="updateDate !=null">
+                and update_date = #{updateDate}
+            </if>
+            <if test="isDelete !=null">
+                and is_delete = #{isDelete}
+            </if>
+        </trim>
+    </select>
+
+    <update id="baseUpdateByObjId" >
+        update tb_purchase
+        <trim prefix="set" suffix=" where id = #{id}" suffixOverrides=",">
+            <if test="id !=null">
+                id =  #{id}
+            </if>
+            <if test="totalMoney !=null">
+                total_money =  #{totalMoney}
+            </if>
+            <if test="payStatus !=null">
+                pay_status =  #{payStatus}
+            </if>
+            <if test="type !=null">
+                type =  #{type}
+            </if>
+            <if test="workerId !=null">
+                worker_id =  #{workerId}
+            </if>
+            <if test="supplierId !=null">
+                supplier_id =  #{supplierId}
+            </if>
+            <if test="comment !=null and comment  != ''">
+                comment  =  #{comment}
+            </if>
+            <if test="purchaseDate !=null">
+                purchase_date =  #{purchaseDate}
+            </if>
+            <if test="distributionStart !=null">
+                distribution_start =  #{distributionStart}
+            </if>
+            <if test="distributionEnd !=null">
+                distribution_end =  #{distributionEnd}
+            </if>
+            <if test="createDate !=null">
+                create_date =  #{createDate}
+            </if>
+            <if test="updateDate !=null">
+                update_date =  #{updateDate}
+            </if>
+            <if test="isDelete !=null">
+                is_delete =  #{isDelete}
+            </if>
+        </trim>
+    </update>
+    <select id="baseSelectOne" resultMap="BaseResultMap">
+        SELECT p.*,
+        s.id supplierId,s.`name` supplierName,
+        u.`name`  userName
+        FROM tb_purchase p,tb_supplier s,sys_user u
+        <trim prefix="where" prefixOverrides="and | or">
+                and p.id = #{id}
+            <if test="totalMoney !=null">
+                and total_money = #{totalMoney}
+            </if>
+            <if test="payStatus !=null">
+                and pay_status = #{payStatus}
+            </if>
+            <if test="type !=null">
+                and type = #{type}
+            </if>
+            <if test="workerId !=null">
+                and p.`worker_id` = #{workerId} and u.`id` = p.`worker_id`
+            </if>
+            <if test="workerId ==null">
+                and u.`id` = p.`worker_id`
+            </if>
+            <if test="supplierId !=null">
+                and supplier_id = #{supplierId}  and p.`supplier_id`= s.`id`
+            </if>
+            <if test="supplierId ==null">
+                and p.`supplier_id`= s.`id`
+            </if>
+            <if test="comment !=null and comment  != ''">
+                and comment  = #{comment}
+            </if>
+            <if test="purchaseDate !=null">
+                and purchase_date = #{purchaseDate}
+            </if>
+            <if test="distributionStart !=null">
+                and distribution_start = #{distributionStart}
+            </if>
+            <if test="distributionEnd !=null">
+                and distribution_end = #{distributionEnd}
+            </if>
+            <if test="createDate !=null">
+                and create_date = #{createDate}
+            </if>
+            <if test="updateDate !=null">
+                and update_date = #{updateDate}
+            </if>
+            <if test="isDelete !=null">
+                and is_delete = #{isDelete}
+            </if>
+        </trim>
+    </select>
+
+</mapper>

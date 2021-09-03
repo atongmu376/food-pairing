@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.phj.mapper.MealOrderItemMapper">
+
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.phj.pojo.MealOrderItem">
+        <id column="id" property="id"/>
+        <result column="meal_plan_id" property="mealPlanId"/>
+        <result column="food_id" property="foodId"/>
+        <result column="market_price" property="marketPrice"/>
+        <result column="total_quantity" property="totalQuantity"/>
+        <association property="food">
+            <id property="id" column="food_id"></id>
+            <result property="name" column="foodName"/>
+            <result property="specification" column="specification"/>
+            <result property="brand" column="brand"/>
+            <result property="foodUnit.name" column="unitName"/>
+        </association>
+    </resultMap>
+
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, meal_plan_id, food_id, market_price, total_quantity
+    </sql>
+
+    <select id="baseSelect" resultMap="BaseResultMap">
+
+        SELECT item.*,food.`brand`,food.`name` foodName,food.specification,unit.`name` unitName
+        FROM tb_meal_order_item item
+        LEFT JOIN tb_food food
+        ON food.`id`=item.`food_id`
+        LEFT JOIN tb_food_unit unit
+        ON unit.`id`=food.`tb_unit_id`
+        <trim prefix="where" prefixOverrides="and | or">
+                <if test="id !=null">
+                    and item.id = #{id}
+                </if>
+                <if test="mealPlanId !=null">
+                    and item.meal_plan_id = #{mealPlanId}
+                </if>
+                <if test="foodId !=null">
+                    and item.food_id = #{foodId}
+                </if>
+
+                <if test="marketPrice !=null">
+                    and item.market_price = #{marketPrice}
+                </if>
+
+                <if test="totalQuantity !=null">
+                    and item.total_quantity = #{totalQuantity}
+                </if>
+        </trim>
+    </select>
+
+    <update id="baseUpdateByObjId" >
+        update tb_meal_order_item
+        <trim prefix="set" suffix=" where id = #{id}" suffixOverrides=",">
+                    <if test="id !=null">
+                        id =  #{id}
+                    </if>
+                    <if test="mealPlanId !=null">
+                        meal_plan_id =  #{mealPlanId}
+                    </if>
+                    <if test="foodId !=null">
+                        food_id =  #{foodId}
+                    </if>
+                    <if test="marketPrice !=null">
+                         market_price =  #{marketPrice}
+                    </if>
+
+                    <if test="totalQuantity !=null">
+                         total_quantity =  #{totalQuantity}
+                    </if>
+        </trim>
+    </update>
+
+</mapper>

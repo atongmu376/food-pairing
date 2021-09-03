@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.phj.mapper.SupplierMapper">
+
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.phj.pojo.Supplier">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="phone_num" property="phoneNum"/>
+        <result column="address" property="address"/>
+        <result column="certification_image" property="certificationImage"/>
+        <result column="expiration" property="expiration"/>
+        <result column="is_delete" property="isDelete"/>
+    </resultMap>
+
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name, phone_num, address, certification_image, expiration, is_delete
+    </sql>
+
+    <select id="baseSelect" resultMap="BaseResultMap">
+
+        select <include refid="Base_Column_List"></include> from tb_supplier
+        <trim prefix="where" prefixOverrides="and | or">
+                <if test="id !=null">
+                    and id = #{id}
+                </if>
+                <if test="name !=null and name  != ''">
+                    and name   like concat('%',#{name},'%')
+                </if>
+                <if test="phoneNum !=null and phoneNum  != ''">
+                    and phone_num  = #{phoneNum}
+                </if>
+                <if test="address !=null and address  != ''">
+                    and address  = #{address}
+                </if>
+                <if test="certificationImage !=null and certificationImage  != ''">
+                    and certification_image  = #{certificationImage}
+                </if>
+                <if test="expiration !=null">
+                    and expiration = #{expiration}
+                </if>
+                <if test="isDelete !=null">
+                    and is_delete = #{isDelete}
+                </if>
+        </trim>
+    </select>
+
+    <update id="baseUpdateByObjId" >
+        update tb_supplier
+        <trim prefix="set" suffix=" where id = #{id}" suffixOverrides=",">
+                    <if test="id !=null">
+                        id =  #{id}
+                    </if>
+                    <if test="name !=null and name  != ''">
+                        name  =  #{name}
+                    </if>
+                    <if test="phoneNum !=null and phoneNum  != ''">
+                        phone_num  =  #{phoneNum}
+                    </if>
+                    <if test="address !=null and address  != ''">
+                        address  =  #{address}
+                    </if>
+                    <if test="certificationImage !=null and certificationImage  != ''">
+                        certification_image  =  #{certificationImage}
+                    </if>
+                    <if test="expiration !=null">
+                         expiration =  #{expiration}
+                    </if>
+                    <if test="isDelete !=null">
+                         is_delete =  #{isDelete}
+                    </if>
+        </trim>
+    </update>
+
+</mapper>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.phj.mapper.FoodUnitMapper">
+
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.phj.pojo.FoodUnit">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+    </resultMap>
+
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name
+    </sql>
+
+    <select id="baseSelect" resultMap="BaseResultMap">
+
+        select <include refid="Base_Column_List"></include> from tb_food_unit
+        <trim prefix="where" prefixOverrides="and | or">
+                <if test="id !=null">
+                    and id = #{id}
+                </if>
+                <if test="name !=null and name  != ''">
+                    and name   like concat('%',#{name},'%')
+                </if>
+        </trim>
+    </select>
+
+    <update id="baseUpdateByObjId" >
+        update tb_food_unit
+        <trim prefix="set" suffix=" where id = #{id}" suffixOverrides=",">
+                    <if test="id !=null">
+                        id =  #{id}
+                    </if>
+                    <if test="name !=null and name  != ''">
+                        name  =  #{name}
+                    </if>
+        </trim>
+    </update>
+
+</mapper>

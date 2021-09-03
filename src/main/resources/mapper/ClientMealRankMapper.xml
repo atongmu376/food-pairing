@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.phj.mapper.ClientMealRankMapper">
+
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.phj.pojo.ClientMealRank">
+        <id column="id" property="id"/>
+        <result column="client_id" property="clientId"/>
+        <result column="meal_rank_id" property="mealRankId"/>
+        <result column="meal_price" property="mealPrice"/>
+        <result column="person_num" property="personNum"/>
+        <result column="name" property="mealRank.name"/>
+        <result column="mrId" property="mealRank.id"/>
+        <association property="clients">
+            <result property="name" column="clientName"/>
+            <result property="id" column="client_id"/>
+        </association>
+    </resultMap>
+
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, client_id, meal_rank_id, meal_price, person_num
+    </sql>
+
+    <select id="baseSelect" resultMap="BaseResultMap">
+
+        SELECT  cmr.*,mr.`name`,mr.id mrId
+        FROM `tb_client_meal_rank` cmr,`tb_meal_rank` mr
+
+        <trim prefix="where" prefixOverrides="and | or">
+                <if test="id !=null">
+                    and cmr.id = #{id}
+                </if>
+                <if test="clientId !=null">
+                    and cmr.client_id = #{clientId}
+                </if>
+                <if test="mealRankId !=null">
+                    and cmr.meal_rank_id = #{mealRankId} and cmr.`meal_rank_id`=mr.`id`
+                </if>
+                <if test="mealRankId ==null">
+                    and cmr.`meal_rank_id`=mr.`id`
+                </if>
+                <if test="mealPrice !=null">
+                    and cmr.meal_price = #{mealPrice}
+                </if>
+                <if test="personNum !=null">
+                    and cmr.person_num = #{personNum}
+                </if>
+        </trim>
+    </select>
+    <select id="baseSelectById" resultMap="BaseResultMap">
+        SELECT  cmr.*,mr.`name`,mr.id mrId
+        FROM `tb_client_meal_rank` cmr,`tb_meal_rank` mr
+        where cmr.id = #{id}  AND mr.`id` =cmr.`meal_rank_id`
+    </select>
+    <select id="selectRankAndClient" resultMap="BaseResultMap">
+        SELECT cmr.*,dc.`name` clientName
+        FROM `tb_client_meal_rank` cmr,`tb_distribution_client` dc
+        where  cmr.meal_rank_id = #{mealRankId} AND dc.`id`=cmr.`client_id`
+    </select>
+    <select id="selecxtInfo" resultType="java.lang.Integer">
+        select count(1) from  tb_client_meal_rank
+    </select>
+    <select id="checkClientMealRank" resultType="java.lang.Integer">
+        SELECT count(1) from tb_client_meal_rank
+        <trim prefix="where" prefixOverrides="and | or">
+            <if test="meal.mealRankId !=null">
+                and meal_rank_id = #{meal.mealRankId}
+            </if>
+            <if test="meal.mealPrice !=null">
+                and meal_price = #{meal.mealPrice}
+            </if>
+            <if test="meal.personNum !=null">
+                and person_num = #{meal.personNum}
+            </if>
+        </trim>
+        <foreach collection="list" item="item" open="and  client_id in(" close=")" separator=",">
+              #{item}
+        </foreach>
+
+    </select>
+
+    <update id="baseUpdateByObjId" >
+        update tb_client_meal_rank
+        <trim prefix="set" suffix=" where id = #{id}" suffixOverrides=",">
+                    <if test="id !=null">
+                        id =  #{id},
+                    </if>
+                    <if test="clientId !=null">
+                        client_id =  #{clientId},
+                    </if>
+                    <if test="mealRankId !=null">
+                        meal_rank_id =  #{mealRankId},
+                    </if>
+                    <if test="mealPrice !=null">
+                         meal_price =  #{mealPrice},
+                    </if>
+                    <if test="personNum !=null">
+                         person_num =  #{personNum},
+                    </if>
+        </trim>
+    </update>
+
+</mapper>

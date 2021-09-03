@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.phj.mapper.DistributionClientMapper">
+
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.phj.pojo.DistributionClient">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="phone_name" property="phoneName"/>
+        <result column="phone_num" property="phoneNum"/>
+        <result column="address" property="address"/>
+        <result column="client_type" property="clientType"/>
+        <result column="type_id" property="typeId"/>
+        <result column="group_id" property="groupId"/>
+        <result column="path_id" property="pathId"/>
+        <result column="scope_id" property="scopeId"/>
+        <result column="is_delete" property="isDelete"/>
+        <result column="distributionSorting" property="distributionSorting"/>
+
+        <result property="clientTypeData.typeName" column="clientTypeName"/>
+
+        <result property="pathData.address" column="paddr"/>
+        <result property="groupData.groupName" column="groupName"/>
+        <result property="scopeData.scope" column="scope"/>
+        <result property="typeData.name" column="typeName"/>
+        <result property="typeData.day" column="day"/>
+    </resultMap>
+
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name, phone_name, phone_num, address, client_type, type_id, group_id, path_id, scope_id, is_delete, distributionSorting
+    </sql>
+
+    <select id="baseSelect" resultMap="BaseResultMap">
+
+        SELECT  mas.*, g.`group_name` groupName,p.`address` paddr,s.`scope`,t.`name` typeName,t.`day`,ct.`type_name` clientTypeName
+        FROM tb_distribution_client mas
+        LEFT JOIN tb_distribution_group g
+        ON mas.`group_id`= g.id
+        LEFT JOIN tb_distribution_path p
+        ON p.`id` =mas.`path_id`
+        LEFT JOIN tb_distribution_scope s
+        ON s.`id`=mas.`scope_id`
+        LEFT JOIN tb_distribution_type t
+        ON t.`id`=mas.`type_id`
+        LEFT JOIN tb_client_type ct
+        ON ct.`id`= mas.`client_type`
+
+        <trim prefix="where" prefixOverrides="and | or">
+                <if test="id !=null">
+                    and mas.id = #{id}
+                </if>
+                <if test="name !=null and name  != ''">
+                    and mas.name   like concat('%',#{name},'%')
+                </if>
+                <if test="phoneName !=null and phoneName  != ''">
+                    and mas.phone_name
+                </if>
+                <if test="phoneNum !=null and phoneNum  != ''">
+                    and mas.phone_num  = #{phoneNum}
+                </if>
+                <if test="address !=null and address  != ''">
+                    and mas.address  like concat('%', #{address},'%')
+                </if>
+                <if test="clientType !=null">
+                    and mas.client_type = #{clientType}
+                </if>
+                <if test="typeId !=null">
+                    and mas.type_id = #{typeId}
+                </if>
+                <if test="groupId !=null and groupId  != ''">
+                    and mas.group_id  = #{groupId}
+                </if>
+                <if test="pathId !=null and pathId  != ''">
+                    and mas.path_id  = #{pathId}
+                </if>
+                <if test="scopeId !=null and scopeId  != ''">
+                    and mas.scope_id  = #{scopeId}
+                </if>
+                <if test="isDelete !=null">
+                    and mas.is_delete = #{isDelete}
+                </if>
+                <if test="distributionSorting !=null">
+                    and mas.distributionSorting = #{distributionSorting}
+                </if>
+        </trim>
+    </select>
+
+    <update id="baseUpdateByObjId" >
+        update tb_distribution_client
+        <trim prefix="set" suffix=" where id = #{id}" suffixOverrides=",">
+                    <if test="name !=null and name  != ''">
+                        name  =  #{name},
+                    </if>
+                    <if test="phoneName !=null and phoneName  != ''">
+                        phone_name  =  #{phoneName},
+                    </if>
+                    <if test="phoneNum !=null and phoneNum  != ''">
+                        phone_num  =  #{phoneNum},
+                    </if>
+                    <if test="address !=null and address  != ''">
+                        address  =  #{address},
+                    </if>
+                    <if test="clientType !=null">
+                         client_type =  #{clientType},
+                    </if>
+                    <if test="typeId !=null">
+                        type_id =  #{typeId},
+                    </if>
+                    <if test="groupId !=null and groupId  != ''">
+                        group_id  =  #{groupId},
+                    </if>
+                    <if test="pathId !=null and pathId  != ''">
+                        path_id  =  #{pathId},
+                    </if>
+                    <if test="scopeId !=null and scopeId  != ''">
+                        scope_id  =  #{scopeId},
+                    </if>
+                    <if test="isDelete !=null">
+                         is_delete =  #{isDelete},
+                    </if>
+                    <if test="distributionSorting !=null">
+                         distributionSorting =  #{distributionSorting},
+                    </if>
+        </trim>
+    </update>
+
+
+</mapper>

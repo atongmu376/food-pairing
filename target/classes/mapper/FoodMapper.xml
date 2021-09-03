@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.phj.mapper.FoodMapper">
+
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.phj.pojo.Food">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="specification" property="specification"/>
+        <result column="brand" property="brand"/>
+        <result column="unit" property="unit"/>
+        <result column="tb_unit_id" property="unitId"/>
+        <result column="image" property="image"/>
+        <result column="market_price" property="marketPrice"/>
+        <result column="purchase_price" property="purchasePrice"/>
+        <result column="stock" property="stock"/>
+        <result column="update_version" property="updateVersion"/>
+        <result column="is_delete" property="isDelete"/>
+        <association  property="foodUnit"  javaType="com.phj.pojo.FoodUnit">
+            <id column="uid" property="id"/>
+            <result column="unitName" property="name"/>
+        </association>
+    </resultMap>
+
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name, category_id, specification, brand, unit, tb_unit_id, image, market_price, purchase_price, stock, update_version, is_delete
+    </sql>
+
+    <select id="baseSelect" resultMap="BaseResultMap">
+
+        select <include refid="Base_Column_List"></include> from tb_food
+        <trim prefix="where" prefixOverrides="and | or">
+                <if test="id !=null">
+                    and id = #{id}
+                </if>
+                <if test="name !=null and name  != ''">
+                    and name   like concat('%',#{name},'%')
+                </if>
+                <if test="categoryId !=null">
+                    and category_id = #{categoryId}
+                </if>
+                <if test="specification !=null and specification  != ''">
+                    and specification  = #{specification}
+                </if>
+                <if test="brand !=null and brand  != ''">
+                    and brand  = like concat('%',#{brand},'%')
+                </if>
+                <if test="unit !=null">
+                    and unit = #{unit}
+                </if>
+                <if test="unitId !=null">
+                    and tb_unit_id = #{unitId}
+                </if>
+                <if test="image !=null and image  != ''">
+                    and image  = #{image}
+                </if>
+                <if test="marketPrice !=null">
+                    and market_price = #{marketPrice}
+                </if>
+                <if test="purchasePrice !=null">
+                    and purchase_price = #{purchasePrice}
+                </if>
+                <if test="stock !=null">
+                    and stock = #{stock}
+                </if>
+                <if test="updateVersion !=null">
+                    and update_version = #{updateVersion}
+                </if>
+                <if test="isDelete !=null">
+                    and is_delete = #{isDelete}
+                </if>
+        </trim>
+    </select>
+    <select id="selectFoods" resultMap="BaseResultMap" >
+        SELECT f.*,u.name unitName,u.id uid FROM tb_food f,tb_food_unit u
+        <trim prefix="where" prefixOverrides="and | or">
+            <if test="id !=null">
+                and id = #{id}
+            </if>
+            <if test="name !=null and name  != ''">
+                and f.name   like concat('%',#{name},'%')
+            </if>
+            <if test="unitId !=null">
+                u.id = #{unitId}
+            </if>
+            <if test="brand !=null and brand  != ''">
+                and brand   like concat('%',#{brand},'%')
+            </if>
+            <if test="categoryId !=null">
+                and category_id = #{categoryId}
+            </if>
+            <if test="isDelete !=null">
+                and is_delete = #{isDelete}
+            </if>
+            and tb_unit_id = u.id
+        </trim>
+    </select>
+    <select id="selectFoodsByIds" resultMap="BaseResultMap">
+        select id, name, market_price, purchase_price, stock FROM tb_food
+        <trim prefix="where" prefixOverrides="and | or">
+            <if test="isDelete !=null">
+                and is_delete =#{isDelete}
+            </if>
+            <if test="isDelete == null">
+                and is_delete = 0
+            </if>
+        </trim>
+        <foreach collection="list" close=") " item="item" open="and id in(" separator=",">
+            #{item}
+        </foreach>
+
+    </select>
+    <update id="baseUpdateByObjId" >
+        update tb_food
+        <trim prefix="set" suffix=" where id = #{id}" suffixOverrides=",">
+                    <if test="name !=null and name  != ''">
+                        name  =  #{name}
+                    </if>
+                    <if test="categoryId !=null">
+                        category_id =  #{categoryId}
+                    </if>
+                    <if test="specification !=null and specification  != ''">
+                        specification  =  #{specification}
+                    </if>
+                    <if test="brand !=null and brand  != ''">
+                        brand  =  #{brand}
+                    </if>
+                    <if test="unit !=null">
+                         unit =  #{unit}
+                    </if>
+                    <if test="unitId !=null">
+                        tb_unit_id =  #{unitId}
+                    </if>
+                    <if test="image !=null and image  != ''">
+                        image  =  #{image}
+                    </if>
+                    <if test="marketPrice !=null">
+                         market_price =  #{marketPrice}
+                    </if>
+                    <if test="purchasePrice !=null">
+                         purchase_price =  #{purchasePrice}
+                    </if>
+                    <if test="stock !=null">
+                         stock =  #{stock}
+                    </if>
+                    <if test="updateVersion !=null">
+                         update_version =  #{updateVersion}
+                    </if>
+                    <if test="isDelete !=null">
+                         is_delete =  #{isDelete}
+                    </if>
+        </trim>
+    </update>
+    <update id="updateBatch">
+        update tb_food
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="stock = case" suffix="end,">
+                <foreach collection="list" item="item" >
+                    when id=#{item.id} then stock+#{item.stock}
+                </foreach>
+            </trim>
+            <trim prefix="market_price = case" suffix="end,">
+                <foreach collection="list" item="item" >
+                    when id=#{item.id} then  #{item.marketPrice}
+                </foreach>
+            </trim>
+        </trim>
+        where
+        <foreach collection="list" separator="," item="item" open="id in ( " close=" )">
+           #{item.id}
+        </foreach>
+
+    </update>
+
+    <update id="updateBatchStock">
+        update tb_food
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="stock = case" suffix="end,">
+                <foreach collection="list" item="item" >
+                    when id=#{item.id} then stock+#{item.stock}
+                </foreach>
+            </trim>
+
+        </trim>
+        where
+        <foreach collection="list" separator="," item="item" open="id in ( " close=" )">
+            #{item.id}
+        </foreach>
+
+    </update>
+
+</mapper>

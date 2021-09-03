@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.phj.mapper.PurchaseItemMapper">
+
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.phj.pojo.PurchaseItem">
+        <id column="id" property="id"/>
+        <result column="food_id" property="foodId"/>
+        <result column="purchase_id" property="purchaseId"/>
+        <result column="purchase_price" property="purchasePrice"/>
+        <result column="num" property="num"/>
+        <association property="food" javaType="com.phj.pojo.Food">
+            <id column="foodId" property="id"/>
+            <result column="foodName" property="name"/>
+            <result column="brand" property="brand"/>
+            <result column="specification" property="specification"/>
+            <result property="foodUnit.name" column="unitName"/>
+        </association>
+    </resultMap>
+
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, food_id, purchase_id, purchase_price, num
+    </sql>
+
+    <select id="baseSelect" resultMap="BaseResultMap">
+
+        select <include refid="Base_Column_List"></include> from tb_purchase_item
+        <trim prefix="where" prefixOverrides="and | or">
+                <if test="id !=null">
+                    and id = #{id}
+                </if>
+                <if test="foodId !=null">
+                    and food_id = #{foodId}
+                </if>
+                <if test="purchaseId !=null">
+                    and purchase_id = #{purchaseId}
+                </if>
+                <if test="purchasePrice !=null">
+                    and purchase_price = #{purchasePrice}
+                </if>
+                <if test="num !=null">
+                    and num = #{num}
+                </if>
+        </trim>
+    </select>
+    <select id="selectByOrderId" resultMap="BaseResultMap">
+        SELECT i.*,
+               f.`name` foodName,f.id foodId, f.`brand`,f.`specification`,
+               u.`name` AS unitName
+        FROM tb_purchase_item i,tb_food f ,tb_food_unit u
+
+        WHERE i.`purchase_id`=#{id}
+          AND f.id=i.`food_id` AND f.`tb_unit_id`=u.`id`
+    </select>
+
+    <update id="baseUpdateByObjId" >
+        update tb_purchase_item
+        <trim prefix="set" suffix=" where id = #{id}" suffixOverrides=",">
+                    <if test="id !=null">
+                        id =  #{id}
+                    </if>
+                    <if test="foodId !=null">
+                        food_id =  #{foodId}
+                    </if>
+                    <if test="purchaseId !=null">
+                        purchase_id =  #{purchaseId}
+                    </if>
+                    <if test="purchasePrice !=null">
+                         purchase_price =  #{purchasePrice}
+                    </if>
+                    <if test="num !=null">
+                         num =  #{num}
+                    </if>
+        </trim>
+    </update>
+
+    <insert id="bachInsert">
+        insert into tb_purchase_item (id, food_id, purchase_id, purchase_price, num)
+         values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id},#{item.foodId},#{item.purchaseId},#{item.purchasePrice},#{item.num})
+        </foreach>
+    </insert>
+
+    <delete id="deleteByPurchaseId">
+        delete from tb_purchase_item where purchase_id=#{id}
+    </delete>
+
+</mapper>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.phj.mapper.SysUserRoleRelationMapper">
+
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.phj.pojo.SysUserRoleRelation">
+        <id column="id" property="id"/>
+        <result column="role_id" property="roleId"/>
+        <result column="user_id" property="userId"/>
+    </resultMap>
+
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, role_id, user_id
+    </sql>
+
+    <select id="baseSelect" resultMap="BaseResultMap">
+
+        select <include refid="Base_Column_List"></include> from sys_user_role_relation
+        <trim prefix="where" prefixOverrides="and | or">
+                <if test="id !=null">
+                    and id = #{id}
+                </if>
+                <if test="roleId !=null">
+                    and role_id = #{roleId}
+                </if>
+                <if test="userId !=null">
+                    and user_id = #{userId}
+                </if>
+        </trim>
+    </select>
+    <select id="selectByUid" resultType="com.phj.pojo.SysRole">
+        SELECT id,NAME FROM sys_role WHERE id IN ( SELECT role_id FROM sys_user_role_relation WHERE user_id = #{userId})
+    </select>
+
+    <update id="baseUpdateByObjId" >
+        update sys_user_role_relation
+        <trim prefix="set" suffix=" where id = #{id}" suffixOverrides=",">
+                    <if test="id !=null">
+                        id =  #{id}
+                    </if>
+                    <if test="roleId !=null">
+                        role_id =  #{roleId}
+                    </if>
+                    <if test="userId !=null">
+                        user_id =  #{userId}
+                    </if>
+        </trim>
+    </update>
+
+</mapper>

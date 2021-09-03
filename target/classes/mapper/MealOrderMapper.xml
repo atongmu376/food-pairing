@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.phj.mapper.MealOrderMapper">
+
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.phj.pojo.MealOrder">
+        <id column="id" property="id"/>
+        <result column="client_id" property="clientId"/>
+        <result column="meal_price" property="mealPrice"/>
+        <result column="person_num" property="personNum"/>
+        <result column="total_price" property="totalPrice"/>
+        <result column="meal_rank_id" property="mealRankId"/>
+        <result column="meal_time" property="mealTime"/>
+        <result column="carriage_type" property="carriageType"/>
+        <result column="deliveryTime" property="deliveryTime"/>
+        <result column="sysUserId" property="sysUserId"/>
+        <result column="purchase_date" property="purchaseDate"/>
+        <result column="update_date" property="updateDate"/>
+        <result column="create_date" property="createDate"/>
+        <association property="mealRank">
+            <result property="name" column="mealName"/>
+            <result property="id" column="meal_rank_id"/>
+        </association>
+        <association property="user">
+            <id property="id" column="sysUserId"/>
+            <result property="name" column="userName"/>
+        </association>
+        <association property="client">
+            <id column="client_id" property="id"/>
+            <result column="cliName" property="name"/>
+            <result column="cliPhoneName" property="phoneName"/>
+            <result column="cliAddress" property="address"/>
+            <result column="cliClientType" property="clientType"/>
+            <result column="cliTypeId" property="typeId"/>
+            <result column="cliGroupId" property="groupId"/>
+            <result column="cliPathId" property="pathId"/>
+            <result column="cliScopeId" property="scopeId"/>
+            <result column="pathAddress" property="pathData.address"/>
+            <result column="cliPathId" property="pathData.id"/>
+            <result column="typeName" property="typeData.name"/>
+            <result column="typeDay" property="typeData.day"/>
+            <result column="cliTypeId" property="typeData.id"/>
+            <result column="group_name" property="groupData.groupName"/>
+        </association>
+    </resultMap>
+
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id
+        , client_id, meal_price, person_num, total_price, meal_rank_id, meal_time, carriage_type, deliveryTime, sysUserId, purchasedate, update_date, create_date
+    </sql>
+    <!-- 通用查询多个MealOrder -->
+    <select id="baseSelect" resultMap="BaseResultMap">
+
+        select <include refid="Base_Column_List"></include> from tb_meal_order
+        <trim prefix="where" prefixOverrides="and | or">
+            <if test="id !=null">
+                and id = #{id}
+            </if>
+            <if test="clientId !=null">
+                and client_id = #{clientId}
+            </if>
+            <if test="mealPrice !=null">
+                and meal_price = #{mealPrice}
+            </if>
+            <if test="personNum !=null">
+                and person_num = #{personNum}
+            </if>
+            <if test="totalPrice !=null">
+                and total_price = #{totalPrice}
+            </if>
+            <if test="mealRankId !=null">
+                and meal_rank_id = #{mealRankId}
+            </if>
+            <if test="mealTime !=null">
+                and meal_time = #{mealTime}
+            </if>
+            <if test="carriageType !=null">
+                and carriage_type = #{carriageType}
+            </if>
+            <if test="deliveryTime !=null">
+                and deliveryTime = #{deliveryTime}
+            </if>
+            <if test="sysUserId !=null">
+                and sysUserId = #{sysUserId}
+            </if>
+            <if test="purchaseDate !=null">
+                and purchase_date = #{purchaseDate}
+            </if>
+            <if test="updateDate !=null">
+                and update_date = #{updateDate}
+            </if>
+            <if test="createDate !=null">
+                and create_date = #{createDate}
+            </if>
+        </trim>
+    </select>
+    <!-- 通过id查询 -->
+    <select id="baseSelectById" resultMap="BaseResultMap">
+        SELECT `order`.*,u.`name` userName,mr.`name` mealName,
+        cli.name cliName,
+        cli.phone_name cliPhoneName,
+        cli.address cliAddress,
+        cli.client_type cliClientType ,
+        cli.type_id cliTypeId,
+        cli.group_id cliGroupId,
+        cli.path_id cliPathId,
+        cli.scope_id cliScopeId,
+        path.`address` pathAddress,
+        `type`.`name` typeName,
+        `type`.`day` typeDay,
+        `group`.`group_name`
+        FROM tb_meal_order `order`
+        LEFT JOIN sys_user u
+
+        ON u.`id`=`order`.`sysUserId`
+
+        JOIN `tb_meal_rank` mr
+
+        ON mr.`id`=`order`.`meal_rank_id`
+
+        LEFT JOIN `tb_distribution_client` cli
+        ON cli.`id`=`order`.`client_id`
+        LEFT JOIN `tb_distribution_path` path
+        ON path.`id`=cli.`path_id`
+
+        LEFT JOIN `tb_distribution_type` `type`
+        ON `type`.`id`=cli.`type_id`
+        LEFT JOIN `tb_distribution_group` `group`
+        ON cli.`group_id`=`group`.`id`
+        <trim prefix="where" prefixOverrides="and | or">
+            <if test="id !=null">
+                and `order`.`id` = #{id}
+            </if>
+        </trim>
+    </select>
+    <!-- 通过ids查询多个 -->
+    <select id="baseSelectByIds" resultMap="BaseResultMap">
+        select * from tb_meal_order
+        where id = #{id}
+
+        <trim prefix="in(" suffix=")">
+            <foreach collection="list" item="item">
+                #{item},
+            </foreach>
+        </trim>
+    </select>
+
+
+    <select id="selectOrderInfo" resultMap="BaseResultMap">
+        SELECT `order`.*,u.`name` userName,mr.`name` mealName,
+        cli.name cliName,
+        cli.phone_name cliPhoneName,
+        cli.address cliAddress,
+        cli.client_type cliClientType ,
+        cli.type_id cliTypeId,
+        cli.group_id cliGroupId,
+        cli.path_id cliPathId,
+        cli.scope_id cliScopeId,
+        path.`address` pathAddress,
+        `type`.`name` typeName,
+        `type`.`day` typeDay,
+        `group`.`group_name`
+        FROM tb_meal_order `order`
+        LEFT JOIN sys_user u
+        <if test="sysUserId!=null">
+            ON u.`id`=`order`.`sysUserId` and `order`.`sysUserId`=#{sysUserId}
+        </if>
+        <if test="sysUserId==null">
+            ON u.`id`=`order`.`sysUserId`
+        </if>
+
+        JOIN `tb_meal_rank` mr
+        <if test="mealRankId != null">
+            ON mr.`id`=`order`.`meal_rank_id` AND mr.`id`=#{mealRankId}
+        </if>
+        <if test="mealRankId == null ">
+            ON mr.`id`=`order`.`meal_rank_id`
+        </if>
+        LEFT JOIN `tb_distribution_client` cli
+        ON cli.`id`=`order`.`client_id`
+        LEFT JOIN `tb_distribution_path` path
+        <if test="pathId!=null">
+            ON path.`id`=cli.`path_id` and path.`id`=#{pathId}
+        </if>
+        <if test="pathId==null">
+            ON path.`id`=cli.`path_id`
+        </if>
+
+        LEFT JOIN `tb_distribution_type` `type`
+        ON `type`.`id`=cli.`type_id`
+        LEFT JOIN `tb_distribution_group` `group`
+        ON cli.`group_id`=`group`.`id`
+        <trim prefix="where" prefixOverrides="and | or">
+            <if test="id !=null">
+                and `order`.`id` = #{id}
+            </if>
+
+            <if test="mealStart !=null">
+                and `order`.meal_time  <![CDATA[ >= ]]> #{mealStart}
+            </if>
+            <if test="mealEnd !=null">
+                and `order`.meal_time  <![CDATA[ <= ]]> #{mealEnd}
+            </if>
+
+            <if test="purchaseDateStart !=null">
+                and `order`.purchase_date  <![CDATA[ <= ]]> #{purchaseDateStart}
+            </if>
+
+            <if test="purchaseDateEnd !=null">
+                and `order`.purchase_date <![CDATA[ <= ]]>  #{purchaseDateEnd}
+            </if>
+
+            <if test="clientId !=null">
+                and `order`.client_id = #{clientId}
+            </if>
+            <if test="carriageType !=null">
+                and `order`.carriage_type = 1
+            </if>
+            <if test="carriageType ==null">
+                and `order`.carriage_type = 0
+            </if>
+        </trim>
+
+    </select>
+
+
+    <!-- 通过MealOrder对象查询单个 如果满足多个返回第一条 -->
+    <select id="baseSelectByEntity" resultMap="BaseResultMap">
+        select * from tb_meal_order
+        <trim prefix="where" prefixOverrides="and | or" suffix="limit 1">
+            <if test="id !=null">
+                and id = #{id}
+            </if>
+            <if test="clientId !=null">
+                and client_id = #{clientId}
+            </if>
+            <if test="mealPrice !=null">
+                and meal_price = #{mealPrice}
+            </if>
+            <if test="personNum !=null">
+                and person_num = #{personNum}
+            </if>
+            <if test="totalPrice !=null">
+                and total_price = #{totalPrice}
+            </if>
+            <if test="mealRankId !=null">
+                and meal_rank_id = #{mealRankId}
+            </if>
+            <if test="mealTime !=null">
+                and meal_time = #{mealTime}
+            </if>
+            <if test="carriageType !=null">
+                and carriage_type = #{carriageType}
+            </if>
+            <if test="deliveryTime !=null">
+                and deliveryTime = #{deliveryTime}
+            </if>
+            <if test="sysUserId !=null">
+                and sysUserId = #{sysUserId}
+            </if>
+            <if test="purchaseDate !=null">
+                and purchase_date = #{purchaseDate}
+            </if>
+            <if test="updateDate !=null">
+                and update_date = #{updateDate}
+            </if>
+            <if test="createDate !=null">
+                and create_date = #{createDate}
+            </if>
+        </trim>
+    </select>
+
+    <!-- id修改MealOrder -->
+    <update id="baseUpdateByObjId">
+        update tb_meal_order
+        <trim prefix="set" suffix=" where id = #{id}" suffixOverrides=",">
+            <if test="id !=null">
+                id = #{id},
+            </if>
+            <if test="clientId !=null">
+                client_id = #{clientId},
+            </if>
+            <if test="mealPrice !=null">
+                meal_price = #{mealPrice},
+            </if>
+            <if test="personNum !=null">
+                person_num = #{personNum},
+            </if>
+            <if test="totalPrice !=null">
+                total_price = #{totalPrice},
+            </if>
+            <if test="mealRankId !=null">
+                meal_rank_id = #{mealRankId},
+            </if>
+            <if test="mealTime !=null">
+                meal_time = #{mealTime},
+            </if>
+            <if test="carriageType !=null">
+                carriage_type = #{carriageType},
+            </if>
+            <if test="deliveryTime !=null">
+                deliveryTime = #{deliveryTime},
+            </if>
+            <if test="sysUserId !=null">
+                sysUserId = #{sysUserId},
+            </if>
+            <if test="purchaseDate !=null">
+                purchase_date = #{purchaseDate},
+            </if>
+            <if test="updateDate !=null">
+                update_date = #{updateDate},
+            </if>
+            <if test="createDate !=null">
+                create_date = #{createDate},
+            </if>
+        </trim>
+    </update>
+</mapper>
